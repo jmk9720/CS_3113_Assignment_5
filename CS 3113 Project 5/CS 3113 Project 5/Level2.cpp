@@ -23,6 +23,8 @@ unsigned int LEVEL2_DATA[] =
     0, 152, 152, 152, 152, 152, 152, 152, 152, 152, 152, 152, 152, 152
 };
 
+GLuint level2_text_texture_id;
+
 Level2::~Level2()
 {
     delete [] m_state.enemies;
@@ -52,6 +54,8 @@ void Level2::initialise()
     m_state.player->set_acceleration(glm::vec3(0.0f, -9.81f, 0.0f));
     m_state.player->m_texture_id = Utility::load_texture("assets/images/player.png");
     m_state.player->stage_clear = false;
+    m_state.player->death = false;
+    set_dead(false);
     
     // Walking
     m_state.player->set_height(1.0f);
@@ -85,18 +89,22 @@ void Level2::initialise()
     Mix_VolumeMusic(50.0f);
     
     m_state.jump_sfx = Mix_LoadWAV("assets/audio/boing.wav");
+    
+    level2_text_texture_id = Utility::load_texture("assets/fonts/font1.png");
 }
 
 void Level2::update(float delta_time)
 {
     m_state.player->update(delta_time, m_state.player, m_state.enemies, ENEMY_COUNT, m_state.map);
-    if (m_state.player->death) {
-        m_state.death_count += 1;
-        m_state.next_scene_id = 2;
-    }
+    
     for (int i = 0; i < ENEMY_COUNT; i++)
     {
         m_state.enemies[i].update(delta_time, m_state.player, 0, 0, m_state.map);
+    }
+    
+    if (m_state.player->death) {
+        set_dead(true);
+        m_state.next_scene_id = 2;
     }
     
     if (m_state.player->stage_clear) {
@@ -112,5 +120,8 @@ void Level2::render(ShaderProgram *program)
     for (int i = 0; i < ENEMY_COUNT; i++)
     {
         m_state.enemies[i].render(program);
+    }
+    if (m_state.game_over == true && m_state.mission == false) {
+        Utility::draw_text(program, level2_text_texture_id, "YOU LOSE!", 0.5f, 0.0f, glm::vec3(m_state.player->get_position().x - 1.5f, m_state.player->get_position().y - 3.0f, 0.0f));
     }
 }

@@ -9,12 +9,15 @@ unsigned int LEVEL1_DATA[] =
     0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
     0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
     0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+    0,   0,   0, 103,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
     0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
     0,   0,   0,   0,   0,   0,   0,   0,   0, 103, 103, 103, 103, 103,
     0, 103, 103, 103, 103, 103, 103, 103, 103, 152, 152, 152, 152, 152,
     0, 152, 152, 152, 152, 152, 152, 152, 152, 152, 152, 152, 152, 152
 };
+
+GLuint level1_text_texture_id;
+
 
 Level1::~Level1()
 {
@@ -45,6 +48,8 @@ void Level1::initialise()
     m_state.player->set_acceleration(glm::vec3(0.0f, -9.81f, 0.0f));
     m_state.player->m_texture_id = Utility::load_texture("assets/images/player.png");
     m_state.player->stage_clear = false;
+    m_state.player->death = false;
+    set_dead(false);
     
     // Walking
     m_state.player->set_height(1.0f);
@@ -78,20 +83,27 @@ void Level1::initialise()
     Mix_VolumeMusic(50.0f);
     
     m_state.jump_sfx = Mix_LoadWAV("assets/audio/boing.wav");
+    
+    level1_text_texture_id = Utility::load_texture("assets/fonts/font1.png");
 }
 
 void Level1::update(float delta_time)
 {
     m_state.player->update(delta_time, m_state.player, m_state.enemies, ENEMY_COUNT, m_state.map);
-    if (m_state.player->death) {
-        m_state.death_count += 1;
-        m_state.next_scene_id = 1;
-    }
+    
     for (int i = 0; i < ENEMY_COUNT; i++)
     {
         m_state.enemies[i].update(delta_time, m_state.player, 0, 0, m_state.map);
     }
-    if (m_state.player->stage_clear) m_state.next_scene_id = 2;
+    if (m_state.player->death) {
+        set_dead(true);
+        m_state.next_scene_id = 1;
+    }
+    
+    if (m_state.player->stage_clear) {
+        m_state.next_scene_id = 2;
+    }
+        
 }
 
 
@@ -102,5 +114,8 @@ void Level1::render(ShaderProgram *program)
     for (int i = 0; i < ENEMY_COUNT; i++)
     {
         m_state.enemies[i].render(program);
+    }
+    if (m_state.game_over == true && m_state.mission == false) {
+        Utility::draw_text(program, level1_text_texture_id, "YOU LOSE", 0.5f, 0.0f, glm::vec3(m_state.player->get_position().x - 1.5f, m_state.player->get_position().y - 3.0f, 0.0f));
     }
 }

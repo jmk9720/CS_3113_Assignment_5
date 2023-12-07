@@ -1,3 +1,12 @@
+/**
+* Author: Jonathan Kim
+* Assignment: Platformer
+* Date due: 2023-12-02, 11:59pm
+* I pledge that I have completed this assignment without
+* collaborating with anyone else, in conformance with the
+* NYU School of Engineering Policies and Procedures on
+* Academic Misconduct.
+**/
 #define GL_SILENCE_DEPRECATION
 #define GL_GLEXT_PROTOTYPES 1
 #define FIXED_TIMESTEP 0.0166666f
@@ -50,7 +59,7 @@ const int FONTBANK_SIZE = 16;
 
 const char TEXT_SPRITE_FILEPATH[] = "assets/fonts/font1.png";
 
-GLuint text_texture_id;
+// GLuint text_texture_id;
 
 // ————— GLOBAL VARIABLES ————— //
 Scene*  g_current_scene;
@@ -70,14 +79,14 @@ glm::mat4 g_view_matrix, g_projection_matrix;
 float g_previous_ticks  = 0.0f;
 float g_accumulator     = 0.0f;
 
-int death_count = 0;
-bool mission;
+int life_count = 0;
+bool death = false;
+// bool mission;
 
 
 void switch_to_scene(Scene* scene)
 {
     g_current_scene = scene;
-    std::cout << "Hit" << std::endl;
     g_current_scene->initialise();
 }
 
@@ -216,7 +225,7 @@ void update()
         g_accumulator = delta_time;
         return;
     }
-    if (g_current_scene->m_state.game_over == false) {
+    if (!g_current_scene->m_state.game_over) {
         while (delta_time >= FIXED_TIMESTEP) {
             // ————— UPDATING THE SCENE (i.e. map, character, enemies...) ————— //
             g_current_scene->update(FIXED_TIMESTEP);
@@ -225,14 +234,18 @@ void update()
         }
 
         g_accumulator = delta_time;
-        if (g_current_scene->m_state.death_count == 3) {
-            mission = false;
+        if (life_count == 3) {
+            // mission = false;
             g_current_scene->m_state.game_over = true;
             g_current_scene->m_state.mission = false;
         }
-        else if (g_current_scene->m_state.game_over == true && g_current_scene->m_state.death_count < 3) {
-            mission = true;
+        else if (g_current_scene->m_state.game_over == true && life_count < 3) {
+            // mission = true;
             g_current_scene->m_state.mission = true;
+        }
+        if (g_current_scene->m_state.dead) {
+            life_count += 1;
+            std::cout << life_count << std::endl;
         }
     }
     
@@ -254,7 +267,7 @@ void render()
     glClear(GL_COLOR_BUFFER_BIT);
 
     // ————— RENDERING THE SCENE (i.e. map, character, enemies...) ————— //
-    // glUseProgram(g_shader_program.programID);
+    glUseProgram(g_shader_program.programID);
     g_current_scene->render(&g_shader_program);
     
     SDL_GL_SwapWindow(g_display_window);

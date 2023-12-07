@@ -76,7 +76,7 @@ public:
     bool m_enemy_left = false;
     bool m_enemy_right = false;
     
-    int death = false;
+    bool death = false;
     bool stage_clear = false;
 
     GLuint    m_texture_id;

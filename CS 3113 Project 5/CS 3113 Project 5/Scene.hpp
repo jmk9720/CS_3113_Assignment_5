@@ -32,9 +32,10 @@ struct GameState
     
     // ————— POINTERS TO OTHER SCENES ————— //
     int next_scene_id;
-    int death_count = 0;
+    // int death_count = 0;
     bool game_over = false;
     bool mission;
+    bool dead = false;
 };
 
 class Scene {
@@ -52,4 +53,6 @@ public:
     // ————— GETTERS ————— //
     GameState const get_state()             const { return m_state;             }
     int       const get_number_of_enemies() const { return m_number_of_enemies; }
+    
+    void const set_dead(bool dead) { m_state.dead = dead; }
 };
