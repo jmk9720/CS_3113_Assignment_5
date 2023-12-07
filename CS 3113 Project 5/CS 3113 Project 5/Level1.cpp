@@ -100,7 +100,7 @@ void Level1::update(float delta_time)
         m_state.next_scene_id = 1;
     }
     
-    if (m_state.player->stage_clear) {
+    if (m_state.player->get_position().y < -10.0f) {
         m_state.next_scene_id = 2;
     }
         

@@ -82,6 +82,7 @@ float g_accumulator     = 0.0f;
 int life_count = 0;
 bool death = false;
 // bool mission;
+bool double_jump = false;
 
 
 void switch_to_scene(Scene* scene)
@@ -169,6 +170,11 @@ void process_input()
                 {
                     g_current_scene->m_state.player->m_is_jumping = true;
                     Mix_PlayChannel(-1, g_current_scene->m_state.jump_sfx, 0);
+                    double_jump = true;
+                }
+                else if (double_jump == true) {
+                    double_jump = false;
+                    g_current_scene->m_state.player->m_is_jumping = true;
                 }
                 break;
                     
@@ -225,14 +231,13 @@ void update()
         g_accumulator = delta_time;
         return;
     }
-    if (!g_current_scene->m_state.game_over) {
+    if (g_current_scene->m_state.game_over == false) {
         while (delta_time >= FIXED_TIMESTEP) {
             // ————— UPDATING THE SCENE (i.e. map, character, enemies...) ————— //
             g_current_scene->update(FIXED_TIMESTEP);
             
             delta_time -= FIXED_TIMESTEP;
         }
-
         g_accumulator = delta_time;
         if (life_count == 3) {
             // mission = false;
@@ -241,7 +246,9 @@ void update()
         }
         else if (g_current_scene->m_state.game_over == true && life_count < 3) {
             // mission = true;
+            std::cout << g_current_scene->m_state.game_over << std::endl;
             g_current_scene->m_state.mission = true;
+            g_current_scene->m_state.game_over = true;
         }
         if (g_current_scene->m_state.dead) {
             life_count += 1;
@@ -249,7 +256,6 @@ void update()
         }
     }
     
-
     // ————— PLAYER CAMERA ————— //
     g_view_matrix = glm::mat4(1.0f);
 

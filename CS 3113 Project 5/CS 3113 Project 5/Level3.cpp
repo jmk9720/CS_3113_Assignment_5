@@ -102,10 +102,12 @@ void Level3::update(float delta_time)
     }
     if (m_state.player->death) {
         set_dead(true);
-        m_state.next_scene_id = 3;
+        m_state.next_scene_id = 1;
     }
-    if (m_state.player->stage_clear == true) {
+    if (m_state.player->get_position().y < -10.0f) {
         m_state.game_over = true;
+//        m_state.player->set_movement(glm::vec3(0.0f, 0.0f, 0.0f));
+//        m_state.player->set_acceleration(glm::vec3(0.0f, 0.0f, 0.0f));
     }
 }
 
@@ -123,6 +125,6 @@ void Level3::render(ShaderProgram *program)
         Utility::draw_text(program, level3_text_texture_id, "YOU LOSE!", 0.5f, 0.0f, glm::vec3(m_state.player->get_position().x - 1.5f, m_state.player->get_position().y - 3.0f, 0.0f));
     }
     else if (m_state.game_over == true && m_state.mission == true) {
-        Utility::draw_text(program, level3_text_texture_id, "YOU WIN!", 0.5f, 0.0f, glm::vec3(m_state.player->get_position().x - 1.5f, m_state.player->get_position().y + 0.5f, 0.0f));
+        Utility::draw_text(program, level3_text_texture_id, "YOU WIN!", 0.5f, 0.0f, glm::vec3(m_state.player->get_position().x - 1.5f, m_state.player->get_position().y + 7.0f, 0.0f));
     }
 }

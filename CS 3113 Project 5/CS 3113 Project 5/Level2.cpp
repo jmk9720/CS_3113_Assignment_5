@@ -104,10 +104,10 @@ void Level2::update(float delta_time)
     
     if (m_state.player->death) {
         set_dead(true);
-        m_state.next_scene_id = 2;
+        m_state.next_scene_id = 1;
     }
     
-    if (m_state.player->stage_clear) {
+    if (m_state.player->get_position().y < -10.0f) {
         m_state.next_scene_id = 3;
     }
 }

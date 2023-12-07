@@ -110,7 +110,11 @@ void Entity::ai_guard(Entity* player)
             m_movement = glm::vec3(1.0f, 0.0f, 0.0f);
         }
         
-        if (glm::distance(m_position, player->get_position()) > 3.0f) m_ai_state = IDLE;
+        if (glm::distance(m_position, player->get_position()) > 3.0f)
+        {
+            m_movement = glm::vec3(0.0f, 0.0f, 0.0f);
+            m_ai_state = IDLE;
+        }
         break;
 
     case ATTACKING:
@@ -125,7 +129,7 @@ void Entity::ai_guard(Entity* player)
 void Entity::update(float delta_time, Entity* player, Entity* objects, int object_count, Map* map)
 {
     if (!m_is_active) return;
-
+    
     m_collided_top = false;
     m_collided_bottom = false;
     m_collided_left = false;
@@ -197,7 +201,7 @@ void const Entity::check_collision_y(Entity* collidable_entities, int collidable
                 m_position.y += y_overlap;
                 m_velocity.y = 0;
                 m_collided_bottom = true;
-                stage_clear = true;
+                death = true;
             }
         }
     }
